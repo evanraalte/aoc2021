@@ -1,5 +1,5 @@
-def count_zeros_ones(l):
-    return l.count("0"), l.count("1")
+def has_more_ones(l):
+    return l.count("1") >= l.count("0")
 
 
 def transpose(arr):
@@ -9,28 +9,19 @@ def transpose(arr):
 
 def get_power_rate(lines):
     transposed_lines = transpose(lines)
-    epsilon = 0
     gamma = 0
     for line in transposed_lines:
         gamma = gamma << 1
-        epsilon = epsilon << 1
-        z, o = count_zeros_ones(line)
-        if o > z:  # one is most common
-            gamma += 1
-        elif z > o:  # zero is most common
-            epsilon += 1
-        else:
-            raise Exception("Something went wrong here..")
-    return epsilon * gamma
+        gamma += int(has_more_ones(line))
+    return gamma * (2 ** len(transposed_lines) - 1 - gamma)
 
 
 def find_value(lines, criteria):
     max_iterations = len(lines[1])
     mask = ""
     for i in range(0, max_iterations):
-        transposed_line = list(map(lambda l: l[i], lines))
-        z, o = count_zeros_ones(transposed_line)
-        mask += str(int(not ((z <= o) ^ bool(criteria))))
+        tl = list(map(lambda l: l[i], lines))
+        mask += str(int(not ((has_more_ones(tl)) ^ bool(criteria))))  # NOR gate
         lines = list(filter(lambda l: l.startswith(mask), lines))
         if len(lines) == 1:
             break
