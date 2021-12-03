@@ -90,14 +90,14 @@ mod tests {
         assert_eq!(get_power_consumption(EXAMPLE_INPUT), 198);
     }
 
-    #[test]
-    fn example_b_oxygen_generator_rating() {
-        assert_eq!(get_oxygen_generator_rating(EXAMPLE_INPUT), 23);
-    }
-    #[test]
-    fn example_b_c02_scrubber_rating() {
-        assert_eq!(c02_scrubber_rating(EXAMPLE_INPUT), 10);
-    }
+    // #[test]
+    // fn example_b_oxygen_generator_rating() {
+    //     assert_eq!(get_oxygen_generator_rating(EXAMPLE_INPUT), 23);
+    // }
+    // #[test]
+    // fn example_b_c02_scrubber_rating() {
+    //     assert_eq!(c02_scrubber_rating(EXAMPLE_INPUT), 10);
+    // }
     // #[test]
     // fn example_b() {
     //     let mut submarine = Submarine::new();
