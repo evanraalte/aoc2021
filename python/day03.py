@@ -28,8 +28,8 @@ def find_value(lines, criteria):
     max_iterations = len(lines[1])
     mask = ""
     for i in range(0, max_iterations):
-        transposed_lines = transpose(lines)
-        z, o = count_zeros_ones(transposed_lines[i])
+        transposed_line = list(map(lambda l: l[i], lines))
+        z, o = count_zeros_ones(transposed_line)
         mask += str(int(not ((z <= o) ^ bool(criteria))))
         lines = list(filter(lambda l: l.startswith(mask), lines))
         if len(lines) == 1:
