@@ -2,14 +2,10 @@ from functools import lru_cache
 
 
 @lru_cache(maxsize=None)
-def reproduce(state, num_days, num_fish=1):
-    while num_days > 0:
-        num_days -= 1
-        if state == 0:
-            num_fish += reproduce(state=8, num_days=num_days)
-            state = 6
-        else:
-            state -= 1
+def reproduce(state, num_days):
+    num_fish = 1
+    for day in range(num_days - state, 0, -7):
+        num_fish += reproduce(state=8, num_days=day - 1)
     return num_fish
 
 
