@@ -1,23 +1,14 @@
-from functools import lru_cache
-
-
-@lru_cache(maxsize=None)
-def reproduce(state, num_days):
-    num_fish = 1
-    for day in range(num_days - state, 0, -7):
-        num_fish += reproduce(state=8, num_days=day - 1)
-    return num_fish
+from collections import deque
 
 
 def calc_fishes(days, initial_fishes):
-    return sum(reproduce(f, days) for f in initial_fishes)
+    table = deque(initial_fishes.count(k) for k in range(0, 9))
+    for _ in range(0, days):
+        table.rotate(-1)
+        table[6] += table[8]
+    return sum(table)
 
 
 initial_fishes = [int(x) for x in open("assets/day06.txt").read().split(",")]
-
-import sys
-
-# print(sys.getrecursionlimit())
-sys.setrecursionlimit(100000)
-# print(f"Part A: {calc_fishes(80, initial_fishes)}")
-print(f"Part B: {calc_fishes(50000, initial_fishes)}")
+print(f"Part A: {calc_fishes(80, initial_fishes)}")
+print(f"Part B: {calc_fishes(256, initial_fishes)}")
