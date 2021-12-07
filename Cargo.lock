@@ -6,6 +6,7 @@ version = 3
 name = "aoc2021"
 version = "0.1.0"
 dependencies = [
+ "min-max",
  "nom",
  "transpose",
 ]
@@ -15,6 +16,15 @@ name = "autocfg"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
+
+[[package]]
+name = "min-max"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fe75516622e34f7e712e0f60b6a9bb1b2df281d1985c11a21fa5dabc1e34885f"
+dependencies = [
+ "partial-min-max",
+]
 
 [[package]]
 name = "nom"
@@ -40,6 +50,12 @@ checksum = "9a64b1ec5cda2586e284722486d802acf1f7dbdc623e2bfc57e65ca1cd099290"
 dependencies = [
  "autocfg",
 ]
+
+[[package]]
+name = "partial-min-max"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6448add382c60bbbc64f9dab41309a12ec530c05191601042f911356ac09758c"
 
 [[package]]
 name = "strength_reduce"
