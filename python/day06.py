@@ -17,7 +17,11 @@ def calc_fishes(days, initial_fishes):
     return sum(reproduce(f, days) for f in initial_fishes)
 
 
-initial_fishes = (int(x) for x in open("assets/day06.txt").read().split(","))
+initial_fishes = [int(x) for x in open("assets/day06.txt").read().split(",")]
 
-print(f"Part A: {calc_fishes(80, initial_fishes)}")
-print(f"Part B: {calc_fishes(256, initial_fishes)}")
+import sys
+
+# print(sys.getrecursionlimit())
+sys.setrecursionlimit(100000)
+# print(f"Part A: {calc_fishes(80, initial_fishes)}")
+print(f"Part B: {calc_fishes(50000, initial_fishes)}")
