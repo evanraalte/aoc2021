@@ -1,5 +1,5 @@
 def eq(n):
-    return int(0.5 * n ** 2 + 0.5 * n)
+    return (n ** 2 + n) >> 1
 
 
 crabs = [int(x) for x in open("assets/day07.txt").read().split(",")]
