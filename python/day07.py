@@ -1,3 +1,7 @@
+from functools import lru_cache
+
+
+@lru_cache(maxsize=None)
 def eq(n):
     return (n ** 2 + n) >> 1
 
