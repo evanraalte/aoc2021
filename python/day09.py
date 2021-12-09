@@ -1,42 +1,41 @@
-with open("assets/day09-sample.txt") as f:
-    data = {
+from functools import reduce
+
+with open("assets/day09.txt") as f:
+    basin = {
         (x, y): int(num)
         for (y, line) in enumerate(f.read().split("\n"))
         for (x, num) in enumerate(line)
     }
-    x_max = max(list(data.keys()), key=lambda x: x[0])[0]
-    y_max = max(list(data.keys()), key=lambda y: y[1])[1]
 
 
-def get_coord(c):
-    if c in data:
-        return data[c]
-    else:
-        return 9
+def get_depth(c):
+    return basin.get(c, 9)
 
 
-def get_basin_size(c):
-
-    size = 1
+def get_pond_coordinates(c, parent=None):
+    pond_coordinates = set([c])
     x, y = c
-    coords = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
-    for coord in coords:
-        if 9 > get_coord(coord) >= get_coord(c):
-            print(f"{coord}")
-            size += get_basin_size(coord)
-    return size
+    neighbours = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
+    for neighbour in neighbours:
+        if (neighbour != parent) and (9 > get_depth(neighbour) >= get_depth(c)):
+            pond_coordinates = pond_coordinates.union(
+                get_pond_coordinates(neighbour, c)
+            )
+    return pond_coordinates
 
 
 def is_low_point(c):
     x, y = c
     coords = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
-    return all(map(lambda n: get_coord(n) > get_coord(c), coords))
+    return all(map(lambda n: get_depth(n) > get_depth(c), coords))
 
 
-low_points = list(filter(lambda k: is_low_point(k[0]), data.items()))
-parta = sum(map(lambda v: v[1] + 1, low_points))
+bottom_coordinates = list(filter(lambda k: is_low_point(k), basin.keys()))
+parta = sum(map(lambda k: basin[k] + 1, bottom_coordinates))
 print(f"Part A: {parta}")
 
-s = [get_basin_size(lp) for lp in map(lambda k: k[0], low_points)]
-
-pass
+three_largest_ponds = sorted(
+    len(get_pond_coordinates(lp)) for lp in map(lambda bc: bc, bottom_coordinates)
+)[-3:]
+partb = reduce(lambda x, y: x * y, three_largest_ponds)
+print(f"Part B: {partb}")
