@@ -8,34 +8,31 @@ with open("assets/day09.txt") as f:
     }
 
 
-def get_depth(c):
-    return basin.get(c, 9)
-
-
-def get_pond_coordinates(c, parent=None):
-    pond_coordinates = set([c])
+def get_pond_coordinates(basin, c, existing_pond_coordinates=None):
+    if existing_pond_coordinates is None:
+        existing_pond_coordinates = set()
+    existing_pond_coordinates.add(c)
     x, y = c
     neighbours = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
     for neighbour in neighbours:
-        if (neighbour != parent) and (9 > get_depth(neighbour) >= get_depth(c)):
-            pond_coordinates = pond_coordinates.union(
-                get_pond_coordinates(neighbour, c)
-            )
-    return pond_coordinates
+        if (neighbour not in existing_pond_coordinates) and (9 > basin.get(neighbour, 9) >= basin.get(c, 9)):
+            get_pond_coordinates(basin, neighbour, existing_pond_coordinates)
+    return existing_pond_coordinates
 
 
-def is_low_point(c):
+def is_low_point(basin, c):
     x, y = c
     coords = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
-    return all(map(lambda n: get_depth(n) > get_depth(c), coords))
+    return all(map(lambda n: basin.get(n, 9) > basin.get(c, 9), coords))
 
 
-bottom_coordinates = list(filter(lambda k: is_low_point(k), basin.keys()))
+bottom_coordinates = list(
+    filter(lambda k: is_low_point(basin, k), basin.keys()))
 parta = sum(map(lambda k: basin[k] + 1, bottom_coordinates))
 print(f"Part A: {parta}")
 
 three_largest_ponds = sorted(
-    len(get_pond_coordinates(lp)) for lp in map(lambda bc: bc, bottom_coordinates)
+    len(get_pond_coordinates(basin, lp)) for lp in map(lambda bc: bc, bottom_coordinates)
 )[-3:]
 partb = reduce(lambda x, y: x * y, three_largest_ponds)
 print(f"Part B: {partb}")
