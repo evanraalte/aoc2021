@@ -59,10 +59,7 @@ for line in data:
         try:
             rem = check_chunk(rem[0], rem[1:])
         except LineNotFinishedException as e:
-            sub = 0
-            for c in e.line:
-                sub *= 5
-                sub += ")]}>".index(c) + 1
+            sub = reduce(lambda s, c: s * 5 + ")]}>".index(c) + 1, e.line, 0)
             partb.append(sub)
             print(f"Finish line by adding: {e.line} -> + {sub}")
             evaluate_line = False
