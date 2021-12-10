@@ -1,0 +1,7 @@
+# PEP 518 defines pyproject.toml as a configuration file to store build system requirements for Python projects.
+
+# Black config
+[tool.black]
+force-exclude = "pynrfjprog|src/gui/Qt/|_rc.py|external/"
+skip-string-normalization = true
+line-length = 119

@@ -37,9 +37,7 @@ def check_chunk(chunk, remainder):
             raise LineNotFinishedException(chunk)
         elif remainder[0] in "{([<":
             try:
-                remainder = check_chunk(
-                    remainder[0], remainder[1:]
-                )  # solve a new chunk up the stack
+                remainder = check_chunk(remainder[0], remainder[1:])  # solve a new chunk up the stack
             except LineNotFinishedException as e:
                 raise LineNotFinishedException(chunk, e.line)
         elif remainder[0] == chunk_end[chunk]:
