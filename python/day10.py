@@ -1,3 +1,5 @@
+from functools import reduce
+
 chunk_end = {
     "{": "}",
     "(": ")",
@@ -6,15 +8,20 @@ chunk_end = {
 }
 
 score = {
-    "}": 57,
+    "}": 1197,
     ")": 3,
-    "]": 1197,
+    "]": 57,
     ">": 25137,
 }
 
 
 class LineNotFinishedException(Exception):
-    pass
+    line = ""
+
+    def __init__(self, chunk, line=None) -> None:
+        if line:
+            self.line = line
+        self.line += chunk_end[chunk]
 
 
 class InvalidLineException(Exception):
@@ -25,15 +32,16 @@ class InvalidLineException(Exception):
 
 def check_chunk(chunk, remainder):
     closed = False
-    # if chunk in chunk_end.values():
-    #     raise InvalidLineException(chunk, "")
     while not closed:
         if remainder == "":
-            raise LineNotFinishedException()
+            raise LineNotFinishedException(chunk)
         elif remainder[0] in "{([<":
-            remainder = check_chunk(
-                remainder[0], remainder[1:]
-            )  # solve a new chunk up the stack
+            try:
+                remainder = check_chunk(
+                    remainder[0], remainder[1:]
+                )  # solve a new chunk up the stack
+            except LineNotFinishedException as e:
+                raise LineNotFinishedException(chunk, e.line)
         elif remainder[0] == chunk_end[chunk]:
             closed = True
         else:
@@ -45,18 +53,25 @@ def check_chunk(chunk, remainder):
 
 data = open("assets/day10.txt").read().split("\n")
 total = 0
+partb = []
 for line in data:
     evaluate_line = True
     rem = line[:]
     while evaluate_line and rem:  # while the whole thing is not consumed
         try:
             rem = check_chunk(rem[0], rem[1:])
-        except LineNotFinishedException:
-            print(f"during checking {line} -> Line incomplete!")
+        except LineNotFinishedException as e:
+            sub = 0
+            for c in e.line:
+                sub *= 5
+                sub += ")]}>".index(c) + 1
+            partb.append(sub)
+            print(f"Finish line by adding: {e.line} -> + {sub}")
             evaluate_line = False
         except InvalidLineException as e:
             evaluate_line = False
-            print(f"during checking {line} -> Found error!")
             print(f"expected '{e.expected}', found '{e.found}' -> +{score[e.found]}")
             total += score[e.found]
+
 print(f"Part A: {total}")
+print(f"Part B: {sorted(partb)[(len(partb)-1)//2]}")
