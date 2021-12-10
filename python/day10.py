@@ -25,16 +25,15 @@ class InvalidLineException(Exception):
 
 def check_chunk(chunk, remainder):
     closed = False
+    # if chunk in chunk_end.values():
+    #     raise InvalidLineException(chunk, "")
     while not closed:
-        if chunk in chunk_end.values():
-            raise InvalidLineException(chunk, "")
-        elif remainder == "":
+        if remainder == "":
             raise LineNotFinishedException()
         elif remainder[0] in "{([<":
             remainder = check_chunk(
                 remainder[0], remainder[1:]
             )  # solve a new chunk up the stack
-            continue
         elif remainder[0] == chunk_end[chunk]:
             closed = True
         else:
@@ -47,7 +46,6 @@ def check_chunk(chunk, remainder):
 data = open("assets/day10.txt").read().split("\n")
 total = 0
 for line in data:
-    # line = "()())"
     evaluate_line = True
     rem = line[:]
     while evaluate_line and rem:  # while the whole thing is not consumed
