@@ -10,7 +10,8 @@ while not all_flashed:
     for location in octopuses.keys():
         octopuses[location] += 1
     flashed_octopuses = 0
-    while len(flashing_octopuses := list(filter(lambda v: v[1] == 10, octopuses.items()))):
+
+    while flashing_octopuses := [(k, v) for (k, v) in octopuses.items() if v == 10]:
         for location, octopus in flashing_octopuses:
             flashed_octopuses += 1
             for dx, dy in itertools.product([-1, 0, 1], repeat=2):
