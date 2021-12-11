@@ -18,21 +18,17 @@ step = 0
 while not all_flashed:
     step += 1
     exploded_octopuses = set()
-    naturally_incremented = set()
-    first = True
-    while first or any(map(lambda x: x == 10, octopuses.values())):
-        first = False
-        for location, octopus in octopuses.items():
-            if octopus == 10:  # explode
-                exploded_octopuses.add(location)  # add it to already exploded octopuses
-                for dx, dy in itertools.product([-1, 0, 1], [-1, 0, 1]):
-                    n = (location[0] + dx, location[1] + dy)
-                    if octopuses.get(n) and octopuses[n] != 10 and n not in exploded_octopuses:
-                        octopuses[n] += 1
-                octopuses[location] = 0
-            elif location not in exploded_octopuses and location not in naturally_incremented:
-                octopuses[location] += 1
-                naturally_incremented.add(location)
+    for location in octopuses.keys():
+        octopuses[location] += 1
+
+    while any(map(lambda x: x == 10, octopuses.values())):
+        for location, octopus in filter(lambda v: v[1] == 10, octopuses.items()):
+            exploded_octopuses.add(location)  # add it to already exploded octopuses
+            for dx, dy in itertools.product([-1, 0, 1], [-1, 0, 1]):
+                n = (location[0] + dx, location[1] + dy)
+                if octopuses.get(n) and octopuses[n] != 10 and n not in exploded_octopuses:
+                    octopuses[n] += 1
+            octopuses[location] = 0
     total += len(exploded_octopuses)
     if step == 100:
         print("PartA: ", total)
