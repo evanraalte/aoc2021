@@ -1,24 +1,17 @@
+from collections import defaultdict
+
 paths = [tuple(line.split("-")) for line in open("assets/day12.txt").read().split("\n")]
 
-splits = {}
+splits = defaultdict(set)
 for start, end in paths:
-    if start not in splits:
-        splits[start] = set()
     splits[start].add(end)
-    if start != "start" and end != "end":
-        if end not in splits:
-            splits[end] = set()
-        splits[end].add(start)  # add ways back
-
+    splits[end].add(start)
 
 seen = set()
 paths = set()
 
-small_letters = [l for l in splits.keys() if l.islower() and l not in ["start", "end"]]
-
 
 def find_paths(start, twice=None, path=[], seen=set(["start"]), seen_twice=False):
-    seen = seen.copy()
     path = path[:]
     path.append(start)
     if start == "end":
@@ -42,8 +35,9 @@ print("Part A: ", len(paths))
 seen = set()
 paths = set()
 
-for l in small_letters:
-    find_paths("start", twice=l)
+small_letters = [sl for sl in splits.keys() if sl.islower() and sl not in ["start", "end"]]
+for sl in small_letters:
+    find_paths("start", twice=sl)
 print("Part B: ", len(paths))
 
 pass
