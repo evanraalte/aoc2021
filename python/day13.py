@@ -15,17 +15,9 @@ def print_dots(dots):
 
 with open("assets/day13.txt") as f:
     dots_entry, fold_entries = tuple(f.read().split("\n\n"))
-    folds = []
-    for fold in fold_entries.splitlines():
-        fold = fold.lstrip("fold along ")
-        axis, num = fold.split("=")
-        num = int(num)
-        folds.append((axis, num))
-
-    dots = set()
-    for dot in dots_entry.splitlines():
-        x, y = dot.split(",")
-        dots.add((int(x), int(y)))
+    parse = lambda x: (x[0], int(x[1]))
+    folds = [parse(fold.lstrip("fold along ").split("=")) for fold in fold_entries.splitlines()]
+    dots = {map(int, dot.split(",")) for dot in dots_entry.splitlines()}
 
 
 def fold(dots, axis, delta):
