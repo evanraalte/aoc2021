@@ -1,61 +1,44 @@
-from math import inf, isinf
-from collections import defaultdict
+from math import inf
 
-# min_cost = inf
+with open("assets/day15.txt") as f:
+    costs = {(x, y): int(num) for (y, line) in enumerate(
+        f.read().split("\n")) for (x, num) in enumerate(line)}
+    x_max = max(map(lambda x: x[0], costs.keys()))
+    y_max = max(map(lambda y: y[1], costs.keys()))
 
+    costs_b = {}
+    for n in range(0, 5):
+        for (x, y), v in costs.items():
+            costs_b[((x_max+1)*n+x, y)] = (v+n)-9 if (v + n) >= 10 else (v+n)
+    costs = costs_b
+    costs_b = {}
+    for n in range(0, 5):
+        for (x, y), v in costs.items():
+            costs_b[(x, (y_max+1)*n+y)] = (v+n)-9 if (v + n) >= 10 else (v+n)
+    costs = costs_b
 
-# def find_path(start, length=0):
-#     global min_cost
-#     if length >= min_cost:
-#         return
-#     x, y = start
-#     search_area = [(x + 1, y), (x, y + 1)]
-#     if all(map(lambda p: isinf(cavern[p]), search_area)):
-#         if length < min_cost:
-#             min_cost = length
-#         return
-#     for p in search_area:
-#         if isinf(cavern[p]):
-#             continue
-#         find_path(p, length + cavern[p])
-
-
-with open("assets/day15-sample.txt") as f:
-    costs = {(x, y): int(num) for (y, line) in enumerate(f.read().split("\n")) for (x, num) in enumerate(line)}
     edges = {}
     for (x, y) in costs.keys():
-        edges[(x, y)] = [
+        edges[(x, y)] = (
             (d, costs[d]) for d in [(x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1)] if d in costs
-        ]  # source: dest, weight
-    vertices = defaultdict(lambda: inf)
+        )  # source: dest, weight
+    vertices = {k: inf for k in edges.keys()}
     vertices[(0, 0)] = 0  # update costs for first vertice
-
-
-visited = set()
+    vertices_to_check = set(vertices.keys())
 
 
 def update_adj_vertices(vertice):
-    visited.add(vertice)
+    vertices_to_check.remove(vertice)
     neighbours = edges[vertice]
     for n, w in neighbours:
-        if n[0] == inf or n[1] == inf:
-            continue
-        if n not in visited and vertices[vertice] + w < vertices[n]:
+        if n in vertices_to_check and vertices[vertice] + w < vertices[n]:
             vertices[n] = vertices[vertice] + w
 
 
-while visited != set(costs.keys()):
-    t = min(filter(lambda v: (v not in visited), vertices), key=lambda k: vertices[k])
+while vertices_to_check:
+    t = min(vertices_to_check, key=lambda k: vertices[k])
     update_adj_vertices(t)
-
 x_max = max(map(lambda x: x[0], edges.keys()))
 y_max = max(map(lambda y: y[1], edges.keys()))
 
-# buf = ""
-# for y in range(0, 10):
-#     for x in range(0, 10):
-#         ws = 3 - len(str(vertices[(x, y)]))
-#         buf += f"{vertices[(x,y)]}" + " " * ws
-#     buf += '\n'
-# print(buf)
 print(vertices[(x_max, y_max)])
