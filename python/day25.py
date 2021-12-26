@@ -1,3 +1,5 @@
+from math import floor, ceil
+
 def print_field(field):
     buf = ""
     
