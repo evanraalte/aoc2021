@@ -6,37 +6,122 @@ from math import floor, ceil
 # [[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]] becomes [[3,[2,[8,0]]],[9,[5,[7,0]]]].
 
 
-# data = [[6,[5,[4,[3,2]]]],1]
+data = "[[[[[9,8],1],2],3],4]"
+data = "[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]"
+def convert_to_list(hier):
+    depth = 0
+    buf = ""
+    depth_db = {}
+    # depth_complete = False
+    # last_depth = None
+    for d, num in hier:
+        if num is None:
+            depth_db[d] = not depth_db.get(d,False)
+        if depth < d:
+            if buf != '' and buf[-1] == ']':
+                buf += ','
+            if buf != '' and buf[-1] in "1234567890":
+                buf += ','
+            # while depth < d:
+            buf += "["
+            depth +=1
+        elif depth > d:
+            # while depth > d:
+            buf += "]"
+            depth -=1
+        elif depth == d:
+            # if last_depth == depth and depth_complete:
+            #     buf += "],["
+            # else:
+            buf += ","
+            # depth_complete = False
+        # if buf[-1] == ']':
+            # buf += ','
+        if num is not None:
+            buf += str(num)
+            # if depth in depth_db and depth_db[depth]:
+            #     depth_db[depth] = False
+            #     depth_complete = True
+            #     last_depth = depth
+    while depth > 0:
+        buf += "]"
+        depth -= 1
 
-def add_list(l0, l1):
-    return [l0,l1]
-
-data = [[3,[2,[1,[7,3]]]],[1,1]] # add_list([[[[4,3],4],4],[7,[[8,4],9]]], [1,1])
-def reduce(data,depth=0, exploded=False, split=False, rem=(0,0)):
-    r,l = rem
-    if isinstance(data, int):
-        if data >= 10:
-            return ([floor(data/2), ceil(data/2)], (0,0), exploded, True)
-        else:
-            # absorb remainder
-            return (data+r+l, (0,0), exploded, split)
-    elif depth == 4:
-        if not exploded:
-            l,r = tuple(data)
-            return (0, (l,r), True, split)
-        else:
-            return (data, (0,0), exploded, split)
-    else:
-        data[0], (left,right), exploded, split = reduce(data[0], depth+1, exploded, split, rem)
-        data[1], (left,right), exploded, split = reduce(data[1], depth+1, exploded, split, rem)
-        return ([data[0], data[1]], (left, right), exploded, split)
+    return buf
         
 
-print(data)
-done = False
-while not done:
-    data, rem, exploded, split = reduce(data)
-    done = not exploded and not split
-    print(data)
-    pass
-    
+
+def convert_to_hierarchy(data):
+    ptr = 0
+    depth = 0
+    buf = []
+    while ptr < len(data):
+        if data[ptr] == '[':
+            depth += 1
+            ptr += 1
+            if ptr < len(data) and data[ptr] == '[':
+                buf.append((depth, None))
+        elif data[ptr] == ']':
+            depth -= 1
+            ptr += 1
+            if ptr < len(data) and data[ptr] in '],':
+                buf.append((depth, None))
+        elif data[ptr] == ',':
+            ptr += 1
+            continue
+        else:
+            num_buf = ""
+            while data[ptr].isdigit():
+                num_buf += data[ptr]
+                ptr += 1
+            buf.append((depth, int(num_buf)))
+    return buf
+
+def reduce(hier):
+    pair = [(idx, h[1]) for idx, h in enumerate(hier) if h[0] == 5]
+    if len(pair) >=2:
+        idx0, val = pair[0]
+        _idx0 = idx0
+        while _idx0 > 0:
+            try:
+                d,v = hier[_idx0-1]
+                hier[_idx0-1] = (d, v + val)
+                break
+            except TypeError:
+                _idx0 -= 1
+        idx1, val = pair[1]
+        _idx1 = idx1
+        while _idx1 < len(hier)-1:
+            try:
+                d,v = hier[_idx1+1]
+                hier[_idx1+1] = (d, v + val)
+                break
+            except TypeError:
+                _idx1 += 1
+        hier.pop(idx1+1)
+        hier.pop(idx1)
+        hier[idx0] = (4,0)
+        hier.pop(idx0-1)
+        pass
+    else:
+        lgt =[idx for idx, h in enumerate(hier) if h[1] is not None and h[1]>= 10]
+        if len(lgt) > 0:
+            idx= lgt[0]
+            d,v = hier[idx]
+            hier[idx] = (d+1, floor(v/2))
+            hier.insert(idx+1,(d,None))
+            hier.insert(idx+1,(d+1, ceil(v/2)))
+            hier.insert(idx,(d,None))
+            pass
+    return hier
+
+hier = convert_to_hierarchy(data)
+l = convert_to_list(hier)
+print(l)
+
+hier_old = None
+while str(hier) != hier_old:
+    hier_old = str(hier)
+    hier = reduce(hier)
+    l = convert_to_list(hier)
+    print(l)
