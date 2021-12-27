@@ -124,28 +124,41 @@ def add_hier(h1, h2):
 
     return buf
 
-with open("assets/day18.txt") as f:
-    data = f.read().splitlines()
-total = None
-for line in data:
-    hier = convert_to_hierarchy(line)
-    if total is not None:
-        hier = add_hier(total,hier)
-    hier_old = None
-    while str(hier) != hier_old:
-        hier_old = str(hier)
-        hier = _reduce(hier)
-    total = hier.copy()
-    l = convert_to_list(hier)
-    print(l)
+def reduce(data):
+    total = None
+    for line in data:
+        hier = convert_to_hierarchy(line)
+        if total is not None:
+            hier = add_hier(total,hier)
+        hier_old = None
+        while str(hier) != hier_old:
+            hier_old = str(hier)
+            hier = _reduce(hier)
+        total = hier.copy()
+        l = convert_to_list(hier)
+        # print(l)
+    return l
 
 def calc_sum(ls):
     if isinstance(ls, int):
         return ls
     return 3*calc_sum(ls[0]) + 2*calc_sum(ls[1])
-    
-l = eval(l)
+
+
+with open("assets/day18.txt") as f:
+    data = f.read().splitlines()
+l = eval(reduce(data))
 s = calc_sum(l)
-# hier = convert_to_hierarchy(l)
-# print(s)
+print(s)
+
+# part b
+combos = [(a,b) for a in range(len(data)) for b in range(len(data)) if a != b]
+ms = 0
+for c in combos:
+    d = [data[c[0]], data[c[1]]]
+    l = eval(reduce(d))
+    s = calc_sum(l)
+    if s > ms:
+        ms = s
+print(ms)
 pass
