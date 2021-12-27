@@ -77,7 +77,7 @@ def convert_to_hierarchy(data):
             buf.append((depth, int(num_buf)))
     return buf
 
-def reduce(hier):
+def _reduce(hier):
     pair = [(idx, h[1]) for idx, h in enumerate(hier) if h[0] == 5]
     if len(pair) >=2:
         idx0, val = pair[0]
@@ -101,7 +101,8 @@ def reduce(hier):
         hier.pop(idx1+1)
         hier.pop(idx1)
         hier[idx0] = (4,0)
-        hier.pop(idx0-1)
+        if hier[idx0-1] == (4,None):
+            hier.pop(idx0-1)
         pass
     else:
         lgt =[idx for idx, h in enumerate(hier) if h[1] is not None and h[1]>= 10]
@@ -115,13 +116,36 @@ def reduce(hier):
             pass
     return hier
 
-hier = convert_to_hierarchy(data)
-l = convert_to_list(hier)
-print(l)
+def add_hier(h1, h2):
+    fill = [(1,None)]
+    h1 = [(d+1,v) for d,v in h1]
+    h2 = [(d+1,v) for d,v in h2]
+    buf = fill + h1 + fill + h2 + fill
 
-hier_old = None
-while str(hier) != hier_old:
-    hier_old = str(hier)
-    hier = reduce(hier)
+    return buf
+
+with open("assets/day18.txt") as f:
+    data = f.read().splitlines()
+total = None
+for line in data:
+    hier = convert_to_hierarchy(line)
+    if total is not None:
+        hier = add_hier(total,hier)
+    hier_old = None
+    while str(hier) != hier_old:
+        hier_old = str(hier)
+        hier = _reduce(hier)
+    total = hier.copy()
     l = convert_to_list(hier)
     print(l)
+
+def calc_sum(ls):
+    if isinstance(ls, int):
+        return ls
+    return 3*calc_sum(ls[0]) + 2*calc_sum(ls[1])
+    
+l = eval(l)
+s = calc_sum(l)
+# hier = convert_to_hierarchy(l)
+# print(s)
+pass
