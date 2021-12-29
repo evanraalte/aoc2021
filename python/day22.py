@@ -1,43 +1,62 @@
 lines = open("assets/day22-sample.txt").read().splitlines()
 pass
-cubes = 0
-on = set()
+cubes = []
+
+def get_volume(cubes):
+    volume = 0
+    for cube in cubes:
+        (xmin,xmax),(ymin,ymax),(zmin,zmax) = cube
+        volume += (xmax-xmin+1)*(ymax-ymin+1)*(zmax-zmin+1)
+    return volume
 
 for l in lines:
     print(l)
     cmd, rem = l.split()
     (xmin,xmax),(ymin,ymax),(zmin,zmax) = tuple(tuple(map(int,c.split("=")[1].split(".."))) for c in rem.split(","))
-    if cmd == 'on':
-        cubes += (xmax-xmin+1) * (ymax-ymin+1) * (zmax-zmin+1)
-    else:
+    cubes_new = []
+    for ((_xmin,_xmax),(_ymin,_ymax),(_zmin,_zmax)) in cubes:
+        in_x = any(xmin <= x <= xmax for x in [_xmin,_xmax]) or any(_xmin <= x <= _xmax for x in [xmin,xmax])
+        in_y = any(ymin <= y <= ymax for y in [_ymin,_ymax]) or any(_ymin <= y <= _ymax for y in [ymin,ymax])
+        in_z = any(zmin <= z <= zmax for z in [_zmin,_zmax]) or any(_zmin <= z <= _zmax for z in [zmin,zmax])
+
+        if in_x and in_y and in_z:
+            __zmin = _zmin
+            __zmax = _zmax
+            __xmin = _xmin
+            __xmax = _xmax
+
+            if _zmin < zmin: #bottom
+                cn = ((_xmin,_xmax),(_ymin,_ymax),(_zmin,zmin-1))
+                __zmin = zmin
+                cubes_new.append(cn)
+            if _zmax > zmax: #top
+                cn = ((_xmin,_xmax),(_ymin,_ymax),(zmax+1,_zmax))
+                __zmax = zmax
+                cubes_new.append(cn)
+            if _xmin < xmin: #left
+                cn = ((_xmin,xmin-1),(_ymin,_ymax),(__zmin,__zmax))
+                cubes_new.append(cn)
+                __xmin = xmin 
+            if _xmax > xmax: #right
+                cn = ((xmax+1,_xmax),(_ymin,_ymax),(__zmin,__zmax))
+                cubes_new.append(cn)
+                __xmax = xmax 
+            if _ymin < ymin: #back
+                cn = ((__xmin,__xmax),(_ymin,ymin-1),(__zmin,__zmax))
+                cubes_new.append(cn)
+            if _ymax > ymax: #front
+                cn = ((__xmin,__xmax),(ymax+1,_ymax),(__zmin,__zmax))
+                cubes_new.append(cn)
+        else:
+            cubes_new.append(((_xmin,_xmax),(_ymin,_ymax),(_zmin,_zmax)))
         pass
-        # cubes -= (xmax-xmin+1) * (ymax-ymin+1) * (zmax-zmin+1)
-    print(f"{cubes=}")
-
-    # subtract overlap
-    off = set()
-    for c in on:
-        x = set(range(xmin,xmax+1))&set(range(c[0][0],c[0][1]+1))
-        y = set(range(ymin,ymax+1))&set(range(c[1][0],c[1][1]+1))
-        z = set(range(zmin,zmax+1))&set(range(c[2][0],c[2][1]+1))
-        cubes -= len(x)*len(y)*len(z)
-        for d in off: # add overlap that was already turned off
-            dx = set(range(d[0][0],d[0][1]+1))&set(range(c[0][0],c[0][1]+1))
-            dy = set(range(d[1][0],d[1][1]+1))&set(range(c[1][0],c[1][1]+1))
-            dz = set(range(d[2][0],d[2][1]+1))&set(range(c[2][0],c[2][1]+1))
-            cubes += len(dx)*len(dy)*len(dz)
-            pass
-        print(f"{cubes=}")
-        try:
-            off.add(((min(x),max(x)),(min(y),max(y)),(min(z),max(z))))
-        except ValueError:
-            pass
-
-    on.add(((xmin,xmax),(ymin,ymax),(zmin,zmax)))
     pass
-    
-
-print(cubes)
+    # if cube was "on", then add it.
+    if cmd == "on":
+        cubes_new.append(((xmin,xmax),(ymin,ymax),(zmin,zmax)))
+    cubes = cubes_new[:]
+    pass
 pass
+print(get_volume(cubes))
 
 
